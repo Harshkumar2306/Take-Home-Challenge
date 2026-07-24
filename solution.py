@@ -21,7 +21,17 @@ def detect_stall(round_outputs: list[str], window: int, threshold: float) -> int
 
     Returns:
         The 0-indexed round where stall is first detected, or -1.
+        
+    Raises:
+        ValueError: If any of the input constraints are violated.
     """
+    if not (2 <= len(round_outputs) <= 50):
+        raise ValueError(f"Constraint violated: 2 <= len(round_outputs) <= 50. Got {len(round_outputs)}")
+    if not (1 <= window <= 10):
+        raise ValueError(f"Constraint violated: 1 <= window <= 10. Got {window}")
+    if not (0.0 <= threshold <= 1.0):
+        raise ValueError(f"Constraint violated: 0.0 <= threshold <= 1.0. Got {threshold}")
+
     for i in range(1, len(round_outputs)):
         start = max(0, i - window)
         for j in range(start, i):

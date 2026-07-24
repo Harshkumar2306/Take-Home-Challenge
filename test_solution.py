@@ -1,5 +1,6 @@
 """Tests for detect_stall."""
 
+import pytest
 from solution import detect_stall
 
 
@@ -78,3 +79,31 @@ def test_cyclic_pattern():
 def test_special_characters():
     rounds = ["héllo @#$!", "goodbye", "héllo @#$!"]
     assert detect_stall(rounds, window=3, threshold=0.9) == 2
+
+
+# ── Input Validation ────────────────────────────────────────────────────────
+
+def test_invalid_round_outputs_length():
+    with pytest.raises(ValueError, match="Constraint violated"):
+        detect_stall(["only one"], window=1, threshold=0.5)
+    
+    with pytest.raises(ValueError, match="Constraint violated"):
+        detect_stall(["a"] * 51, window=1, threshold=0.5)
+
+
+def test_invalid_window():
+    rounds = ["a", "b", "c"]
+    with pytest.raises(ValueError, match="Constraint violated"):
+        detect_stall(rounds, window=0, threshold=0.5)
+        
+    with pytest.raises(ValueError, match="Constraint violated"):
+        detect_stall(rounds, window=11, threshold=0.5)
+
+
+def test_invalid_threshold():
+    rounds = ["a", "b", "c"]
+    with pytest.raises(ValueError, match="Constraint violated"):
+        detect_stall(rounds, window=1, threshold=-0.1)
+        
+    with pytest.raises(ValueError, match="Constraint violated"):
+        detect_stall(rounds, window=1, threshold=1.1)
