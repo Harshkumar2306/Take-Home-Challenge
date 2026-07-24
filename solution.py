@@ -32,7 +32,11 @@ def detect_stall(round_outputs: list[str], window: int, threshold: float) -> int
         for previous_round in range(lookback_start, current_round):
             previous_output = round_outputs[previous_round]
             
-            similarity = difflib.SequenceMatcher(None, current_output, previous_output).ratio()
+            similarity = difflib.SequenceMatcher(
+                None, 
+                a=current_output, 
+                b=previous_output
+            ).ratio()
             
             if similarity >= threshold:
                 return current_round
