@@ -10,34 +10,33 @@ import difflib
 
 def detect_stall(round_outputs: list[str], window: int, threshold: float) -> int:
     """
-    Returns the 0-indexed round number at which a stall is first detected
-    (i.e., current round's output is >= threshold similar to any output within
-    the previous `window` rounds), or -1 if no stall is detected.
+    Returns the 0-indexed round number at which a stall is first detected.
+    
+    A stall occurs when the current round's output is highly similar
+    (>= threshold) to any output within the previous `window` rounds.
 
     Args:
-        round_outputs: Text output from each round (2 ≤ len ≤ 50).
-        window: How many previous rounds to compare against (1 ≤ window ≤ 10).
-        threshold: Similarity ratio at or above which a stall is declared (0.0–1.0).
+        round_outputs: Text output from each round of the Planner/Critic loop.
+        window: The maximum number of previous rounds to compare against.
+        threshold: The similarity ratio (0.0 to 1.0) required to declare a stall.
 
     Returns:
-        The 0-indexed round where stall is first detected, or -1.
-        
-    Raises:
-        ValueError: If any of the input constraints are violated.
+        The 0-indexed round where a stall is first detected, or -1 if no stall occurs.
     """
-    if not (2 <= len(round_outputs) <= 50):
-        raise ValueError(f"Constraint violated: 2 <= len(round_outputs) <= 50. Got {len(round_outputs)}")
-    if not (1 <= window <= 10):
-        raise ValueError(f"Constraint violated: 1 <= window <= 10. Got {window}")
-    if not (0.0 <= threshold <= 1.0):
-        raise ValueError(f"Constraint violated: 0.0 <= threshold <= 1.0. Got {threshold}")
-
-    for i in range(1, len(round_outputs)):
-        start = max(0, i - window)
-        for j in range(start, i):
-            similarity = difflib.SequenceMatcher(None, round_outputs[i], round_outputs[j]).ratio()
+    for current_round in range(1, len(round_outputs)):
+        current_output = round_outputs[current_round]
+        
+        # Compare only against the previous `window` rounds
+        lookback_start = max(0, current_round - window)
+        
+        for previous_round in range(lookback_start, current_round):
+            previous_output = round_outputs[previous_round]
+            
+            similarity = difflib.SequenceMatcher(None, current_output, previous_output).ratio()
+            
             if similarity >= threshold:
-                return i
+                return current_round
+                
     return -1
 
 
